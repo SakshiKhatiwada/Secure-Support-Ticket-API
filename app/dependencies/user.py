@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from fastapi import Depends, HTTPException
 from sqlmodel import Session
-from app.models import User
+from app.models.user import UserPublic
 from jwt.exceptions import InvalidTokenError
 from app.config import settings
 
@@ -25,7 +25,7 @@ def get_current_user(
     except(InvalidTokenError, ValueError, TypeError):
         raise HTTPException(status_code=401, detail="Bad Request: Invalid Header or expired tokan")
     
-    user = session.get(User, user_id)
+    user = session.get(UserPublic, user_id)
     
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid user")

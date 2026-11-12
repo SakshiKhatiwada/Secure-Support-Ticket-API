@@ -1,12 +1,5 @@
-from enum import Enum
-
+from app.data import Role
 from app.dependencies.user import get_current_user
-
-class Role(str, Enum):
-    USER = "user"
-    STAFF = "staff"
-    ADMIN = "admin"
-    
 from fastapi import Depends, HTTPException, status
 
 class RoleChecker:
