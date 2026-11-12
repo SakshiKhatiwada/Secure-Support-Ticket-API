@@ -8,6 +8,7 @@ from jwt.exceptions import InvalidTokenError
 from app.config import settings
 
 from app.utils.auth import oauth2_scheme
+from app.utils.db import get_user_from_db
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -21,11 +22,11 @@ def get_current_user(
             options={"require": ["sub", "exp"]}
         )
         
-        user_id = int(payload["sub"])
+        username = payload["sub"]
     except(InvalidTokenError, ValueError, TypeError):
         raise HTTPException(status_code=401, detail="Bad Request: Invalid Header or expired tokan")
     
-    user = session.get(UserPublic, user_id)
+    user = get_user_from_db(username=username, session=session)
     
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid user")

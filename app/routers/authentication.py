@@ -4,10 +4,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.dependencies.role_checker import Role
+from app.dependencies.role_checker import Role, RoleChecker
 from app.dependencies.session import SessionDep
+from app.dependencies.user import get_current_user
 from app.models.token import Token
-from app.models.user import Register, UserDB
+from app.models.user import Register, UserDB, UserPublic
 from app.utils.auth import authenticate_user, create_token
 from app.utils.db import if_already_exists
 from app.utils.normalization import normalize
@@ -54,3 +55,7 @@ def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sessi
     access_token = create_token(data={"sub": user.username, "role": user.role}, expires_delta=set_token_expiry())
     
     return Token(access_token= access_token)
+
+@router.get("/me", response_model=UserPublic, status_code=200)
+def get_my_profile(current_user: Annotated[UserDB, Depends(get_current_user)]):
+    return current_user
