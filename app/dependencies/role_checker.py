@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from app.data import Role
 from app.dependencies.user import get_current_user
 from fastapi import Depends, HTTPException, status
@@ -15,3 +17,18 @@ class RoleChecker:
             )
 
         return True
+    
+AdminOnly = Annotated[
+    bool,
+    Depends(RoleChecker([Role.ADMIN]))
+]
+
+StaffOrAdmin = Annotated[
+    bool,
+    Depends(RoleChecker([Role.STAFF, Role.ADMIN]))
+]
+
+AllAccess = Annotated[
+    bool,
+    Depends(RoleChecker([Role.ADMIN, Role.STAFF, Role.USER]))
+]

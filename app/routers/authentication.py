@@ -16,6 +16,8 @@ from app.utils.passwords import hash_password
 from app.config import settings
 from app.utils.tokens import set_token_expiry
 
+UserDep = Annotated[UserDB, Depends(get_current_user)]
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/register", status_code=201)
@@ -57,5 +59,5 @@ def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sessi
     return Token(access_token= access_token)
 
 @router.get("/me", response_model=UserPublic, status_code=200)
-def get_my_profile(current_user: Annotated[UserDB, Depends(get_current_user)]):
+def get_my_profile(current_user: UserDep):
     return current_user
