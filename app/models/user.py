@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field
-from typing import Literal
 from pydantic import ConfigDict
+
+from app.data import Role
 
 class Register(SQLModel):
     username: str = Field(unique=True, index=True, min_length=3, max_length=30, regex=r"^[a-z0-9_]+$")
@@ -8,9 +9,14 @@ class Register(SQLModel):
     
     model_config = ConfigDict(extra="forbid")
     
-class UserDB(SQLModel, Table=True):
-    id: int
+class UserDB(SQLModel, table=True):
+    id: int = Field(primary_key=True)
     username: str = Field(unique=True, index=True, min_length=3, max_length=30)
     hashed_password: str
-    role: Literal["user", "staff", "admin"] = "user"
+    role: Role = Field(default=Role.USER)
+    # role: Literal["user", "staff", "admin"] = "user"
     is_active: bool = True
+    
+class UserPublic(SQLModel):
+    username: str = Field(unique=True)
+    role: Role

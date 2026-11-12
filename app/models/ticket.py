@@ -12,7 +12,10 @@ class CreateTicket(SQLModel):
 class TicketStatus(SQLModel):
     status: Literal["open", "in_progress", "resolved"]
     
-class TicketDB(CreateTicket, Table=True):
+class TicketDB(CreateTicket, table=True):
     id: int | None = Field(default=None, primary_key=True)
     owner_id: int = Field(foreign_key="userdb.id", ondelete="RESTRICT")
     status: Literal["open", "in_progress", "resolved"]
+    
+class TicketPublic(TicketDB):
+    pass
