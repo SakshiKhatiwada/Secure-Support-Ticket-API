@@ -19,3 +19,7 @@ def create_access_token(user_id: int)-> str:
     )
     
     return token
+
+def set_token_expiry() -> timedelta:   
+    access_token_expires = timedelta(minutes=settings.token_expiry_time)
+    return access_token_expires

@@ -7,7 +7,7 @@ from app.models.user import UserPublic
 from jwt.exceptions import InvalidTokenError
 from app.config import settings
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+from app.utils.auth import oauth2_scheme
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -17,7 +17,7 @@ def get_current_user(
         payload = jwt.decode(
             token,
             settings.signature_key,
-            algorithms=["HS256"],
+            algorithms="HS256",
             options={"require": ["sub", "exp"]}
         )
         

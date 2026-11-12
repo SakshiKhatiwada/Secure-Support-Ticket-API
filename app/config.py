@@ -3,6 +3,7 @@ from pathlib import Path
 
 class Settings(BaseSettings):
     signature_key: str
+    algorithm:str
     token_expiry_time: int
     
     model_config = SettingsConfigDict(
