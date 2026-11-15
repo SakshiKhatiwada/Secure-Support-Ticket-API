@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends
 from sqlmodel import create_engine, Session
 
-DB_URL = "sqlite:///../auth.db"
+DB_URL = "sqlite:///../Secure-Support-Ticket-API/auth.db"
 
 engine= create_engine(DB_URL, connect_args={"check_same_thread": False})
 
