@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
 from sqlmodel import select
 
-from app.data import Role
+from app.data import Role, TicketStatus
 from app.dependencies.session import SessionDep
-from app.models.ticket import TicketDB, TicketStatusUpdate
+from app.models.ticket import TicketDB, TicketStatusUpdate, UpdateTicket
 from app.models.user import UserDB
 
 
@@ -96,3 +96,34 @@ def delete_ticket_from_db(tid: int, session: SessionDep):
         session.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="something went wrong")
     return
+
+def update_ticket(tid: int, ticket_info: UpdateTicket, current_user: UserDB, session: SessionDep):
+    db_ticket = session.get(TicketDB, tid)
+    
+    if db_ticket is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
+    
+    if current_user.id != db_ticket.owner_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission Denied")
+        
+    if db_ticket.status is not TicketStatus.OPEN:    
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ticket already under approval")
+    
+    db_ticket.sqlmodel_update(ticket_info.model_dump())
+
+    try: 
+        session.add(db_ticket)
+        session.commit()
+        session.refresh(db_ticket)
+        
+    except: 
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="error occurred"
+        )
+        
+    return db_ticket
+        
+
+    

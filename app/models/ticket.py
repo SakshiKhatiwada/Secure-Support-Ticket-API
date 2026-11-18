@@ -11,6 +11,11 @@ class CreateTicket(SQLModel):
     
     model_config = ConfigDict(extra="forbid")
     
+class UpdateTicket(SQLModel):
+    title: str = Field(min_length=5, max_length=120)
+    description: str = Field(min_length=5, max_length=2000)
+    status: TicketStatus = TicketStatus.OPEN
+    
 class TicketStatusUpdate(SQLModel):
     status: TicketStatus
     
