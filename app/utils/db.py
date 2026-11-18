@@ -86,3 +86,13 @@ def update_ticket_status_in_db(current_user: UserDB, tid: int, ticket_status_inf
     session.commit()
     session.refresh(db_ticket)
     return db_ticket
+
+def delete_ticket_from_db(tid: int, session: SessionDep):
+    ticket = session.get(TicketDB, tid) 
+    try:
+        session.delete(ticket)
+        session.commit()
+    except:
+        session.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="something went wrong")
+    return

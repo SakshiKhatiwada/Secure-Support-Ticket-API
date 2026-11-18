@@ -8,7 +8,7 @@ from app.dependencies.session import SessionDep
 from app.dependencies.user import get_current_user
 from app.models.ticket import TicketDB, TicketPublic, CreateTicket, TicketStatusUpdate
 from app.models.user import UserDB
-from app.utils.db import get_individual_ticket_from_db, get_tickets_from_db, update_ticket_status_in_db
+from app.utils.db import delete_ticket_from_db, get_individual_ticket_from_db, get_tickets_from_db, update_ticket_status_in_db
 
 UserDep = Annotated[UserDB, Depends(get_current_user)]
 
@@ -49,3 +49,9 @@ def get_individual_ticket(tid: int, current_user: UserDep, session: SessionDep):
 @router.patch("/{tid}/status")
 def update_ticket_status(tid: int, status_info: TicketStatusUpdate, current_user: UserDep, session: SessionDep):
     return update_ticket_status_in_db(current_user=current_user, ticket_status_info=status_info, tid=tid, session=session)
+
+@router.delete("/{tid}", status_code=204)
+def delete_ticket(tid: int, current_user: UserDep, session: SessionDep):
+    if current_user.role != Role.ADMIN:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="permission denied")
+    delete_ticket_from_db(tid, session)
