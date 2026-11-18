@@ -26,7 +26,7 @@ def get_all_users_from_db(session: SessionDep):
         select(UserDB)
     ).all()
     
-def get_tickets_from_db(session: SessionDep, user_id: int | None = None):
+def get_tickets_from_db(session: SessionDep, user_id: int | None = None, ticket_status: TicketStatus | None = None):
     
     statement = select(TicketDB)
     
@@ -34,10 +34,17 @@ def get_tickets_from_db(session: SessionDep, user_id: int | None = None):
         statement = statement.where(
             TicketDB.owner_id == user_id
         )
+        
+    if ticket_status:
+        statement = statement.where(TicketDB.status == ticket_status)
     
     results = session.exec(statement).all()
     
-    return results
+    # return results.sort(key=lambda ticket: ticket.id) # IMP .sort() returns None as it modifies the original list
+    
+    results.sort(key=lambda ticket: ticket.id)
+    return results  
+    
 
 def get_individual_ticket_from_db(session: SessionDep, tid: int, current_user: UserDB):
     # ticket = session.get(TicketDB, tid)
