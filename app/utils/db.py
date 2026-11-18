@@ -21,6 +21,11 @@ def get_user_from_db(username: str, session: SessionDep):
             select(UserDB).where(UserDB.username == username)
         ).first()
     
+def get_all_users_from_db(session: SessionDep):
+    return session.exec(
+        select(UserDB)
+    ).all()
+    
 def get_tickets_from_db(session: SessionDep, user_id: int | None = None):
     
     statement = select(TicketDB)
