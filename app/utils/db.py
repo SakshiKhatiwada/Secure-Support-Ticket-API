@@ -3,7 +3,7 @@ from sqlmodel import select
 
 from app.data import Role
 from app.dependencies.session import SessionDep
-from app.models.ticket import TicketDB
+from app.models.ticket import TicketDB, TicketStatusUpdate
 from app.models.user import UserDB
 
 
@@ -63,3 +63,26 @@ def get_individual_ticket_from_db(session: SessionDep, tid: int, current_user: U
     #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission to access this ticket")
     return ticket
     
+def update_ticket_status_in_db(current_user: UserDB, tid: int, ticket_status_info: TicketStatusUpdate,session: SessionDep):
+    if current_user.role == Role.USER:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="permission denied"
+        )
+        
+    db_ticket = session.get(TicketDB, tid) # tid is PK
+    
+    if not db_ticket:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="ticket not found"
+        )
+    
+    ticket_data = ticket_status_info.model_dump(exclude_unset=True)
+    
+    db_ticket.sqlmodel_update(ticket_data)
+    
+    session.add(db_ticket)
+    session.commit()
+    session.refresh(db_ticket)
+    return db_ticket

@@ -6,9 +6,9 @@ from app.data import Role
 from app.dependencies.role_checker import StaffOrAdmin
 from app.dependencies.session import SessionDep
 from app.dependencies.user import get_current_user
-from app.models.ticket import TicketDB, TicketPublic, CreateTicket
+from app.models.ticket import TicketDB, TicketPublic, CreateTicket, TicketStatusUpdate
 from app.models.user import UserDB
-from app.utils.db import get_individual_ticket_from_db, get_tickets_from_db
+from app.utils.db import get_individual_ticket_from_db, get_tickets_from_db, update_ticket_status_in_db
 
 UserDep = Annotated[UserDB, Depends(get_current_user)]
 
@@ -45,3 +45,7 @@ def get_tickets(current_user : UserDep, session: SessionDep):
 @router.get("/{tid}", status_code=None)
 def get_individual_ticket(tid: int, current_user: UserDep, session: SessionDep):
     return get_individual_ticket_from_db(session, tid, current_user)
+
+@router.patch("/{tid}/status")
+def update_ticket_status(tid: int, status_info: TicketStatusUpdate, current_user: UserDep, session: SessionDep):
+    return update_ticket_status_in_db(current_user=current_user, ticket_status_info=status_info, tid=tid, session=session)
