@@ -14,7 +14,7 @@ UserDep = Annotated[UserDB, Depends(get_current_user)]
 
 router = APIRouter(prefix="/tickets", tags=['Tickets'])
 
-@router.post("", response_model=TicketPublic)
+@router.post("", response_model=TicketPublic, status_code=201)
 def create_ticket(ticket: CreateTicket, current_user : UserDep, session: SessionDep):
     new_ticket = TicketDB(
         **ticket.model_dump(),
@@ -42,7 +42,7 @@ def get_tickets(current_user : UserDep, session: SessionDep):
     
     return tickets
 
-@router.get("/{tid}", status_code=None)
+@router.get("/{tid}", status_code=200)
 def get_individual_ticket(tid: int, current_user: UserDep, session: SessionDep):
     return get_individual_ticket_from_db(session, tid, current_user)
 
