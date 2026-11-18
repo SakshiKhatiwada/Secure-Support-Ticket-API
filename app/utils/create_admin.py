@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlmodel import Session
 
 from app.data import Role
@@ -13,9 +14,12 @@ def create_initial_admin(session: Session):
         hashed_password=hash_password(settings.initial_admin_password),
         role=Role.ADMIN
     )
-
-    session.add(admin)
-    session.commit()
+    try:
+        session.add(admin)
+        session.commit()
+    except:
+        session.rollback()
+        raise HTTPException(status_code=500, detail="something went wrong")
     
     print("Admin created successfully")
     

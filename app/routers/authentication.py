@@ -1,10 +1,10 @@
-from sqlite3 import IntegrityError
+# from sqlite3 import IntegrityError
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.dependencies.role_checker import Role, RoleChecker
+from app.dependencies.role_checker import Role
 from app.dependencies.session import SessionDep
 from app.dependencies.user import get_current_user
 from app.models.token import Token
@@ -13,7 +13,6 @@ from app.utils.auth import authenticate_user, create_token
 from app.utils.db import if_already_exists
 from app.utils.normalization import normalize
 from app.utils.passwords import hash_password
-from app.config import settings
 from app.utils.tokens import set_token_expiry
 
 UserDep = Annotated[UserDB, Depends(get_current_user)]
@@ -52,7 +51,10 @@ def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], sessi
     user = authenticate_user(form_data.username, form_data.password, session)
   
     if not user:
-     raise HTTPException(status_code=400, detail="Incorrect username or password")
+     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+ 
+    if not user.is_active:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is inactive")
   
     access_token = create_token(data={"sub": user.username, "role": user.role}, expires_delta=set_token_expiry())
     
