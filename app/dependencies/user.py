@@ -24,7 +24,7 @@ def get_current_user(
         
         username = payload["sub"]
     except(InvalidTokenError, ValueError, TypeError):
-        raise HTTPException(status_code=401, detail="Bad Request: Invalid Header or expired tokan")
+        raise HTTPException(status_code=401, detail="Bad Request: Include WWW-Authenticate: Bearer")
     
     user = get_user_from_db(username=username, session=session)
     

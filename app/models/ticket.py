@@ -1,5 +1,3 @@
-from typing import Literal
-
 from sqlmodel import SQLModel, Field
 from pydantic import ConfigDict
 
@@ -14,8 +12,12 @@ class CreateTicket(SQLModel):
 class UpdateTicket(SQLModel):
     title: str = Field(min_length=5, max_length=120)
     description: str = Field(min_length=5, max_length=2000)
+    
+    model_config = ConfigDict(extra="forbid")
 class TicketStatusUpdate(SQLModel):
     status: TicketStatus
+    
+    model_config = ConfigDict(extra="forbid")
     
 class TicketDB(CreateTicket, table=True):
     id: int | None = Field(default=None, primary_key=True)

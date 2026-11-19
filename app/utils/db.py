@@ -114,7 +114,7 @@ def update_ticket(tid: int, ticket_info: UpdateTicket, current_user: UserDB, ses
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission Denied")
         
     if db_ticket.status is not TicketStatus.OPEN:    
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ticket already under approval")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ticket already under approval")
     
     db_ticket.sqlmodel_update(ticket_info.model_dump())
 
