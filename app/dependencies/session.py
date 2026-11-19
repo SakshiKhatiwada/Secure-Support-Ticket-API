@@ -2,8 +2,9 @@ from typing import Annotated
 
 from fastapi import Depends
 from sqlmodel import create_engine, Session
+from app.config import settings
 
-DB_URL = "sqlite:///../Secure-Support-Ticket-API/auth.db"
+DB_URL=settings.db_url
 
 engine= create_engine(DB_URL, connect_args={"check_same_thread": False})
 
