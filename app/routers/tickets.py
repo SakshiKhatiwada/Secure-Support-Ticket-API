@@ -1,9 +1,8 @@
-from sqlite3 import IntegrityError
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.data import Role, TicketStatus
-from app.dependencies.role_checker import StaffOrAdmin
+from app.dependencies.role_checker import RoleChecker, StaffOrAdmin
 from app.dependencies.session import SessionDep
 from app.dependencies.user import get_current_user
 from app.models.ticket import TicketDB, TicketPublic, CreateTicket, TicketStatusUpdate, UpdateTicket
@@ -32,13 +31,23 @@ def create_ticket(ticket: CreateTicket, current_user : UserDep, session: Session
     
     return new_ticket
 
-@router.get("", status_code=200)
+@router.get("", status_code=200, dependencies=[Depends(RoleChecker([Role.ADMIN, Role.STAFF, Role.USER]))])
 def get_tickets(current_user : UserDep, session: SessionDep, ticket_status: Annotated[TicketStatus | None, Query(alias="status")] = None): # status is conflicting with fastapi import, so this can be done too
     
-    if current_user.role in [Role.STAFF, Role.ADMIN]:
-        tickets = get_tickets_from_db(session, ticket_status=ticket_status)
-    else:
-        tickets = get_tickets_from_db(session, user_id=current_user.id, ticket_status=ticket_status)
+    # my approach initially
+    # if current_user.role in [Role.STAFF, Role.ADMIN]:
+    #     tickets = get_tickets_from_db(session, ticket_status=ticket_status)
+    # else:
+    #     tickets = get_tickets_from_db(session, user_id=current_user.id, ticket_status=ticket_status)
+    
+    # cleaner approach
+    user_id = (
+        None 
+        if current_user.role in [Role.STAFF, Role.ADMIN]
+        else current_user.id
+    )
+    
+    tickets = get_tickets_from_db(session, user_id=user_id, ticket_status=ticket_status)
     
     return tickets
 
@@ -50,9 +59,9 @@ def get_individual_ticket(tid: int, current_user: UserDep, session: SessionDep):
 def put_ticket(tid: int, ticket_info: UpdateTicket, current_user: UserDep, session: SessionDep):
     return update_ticket(tid, ticket_info, current_user, session)
 
-@router.patch("/{tid}/status", status_code=200)
-def update_ticket_status(tid: int, status_info: TicketStatusUpdate, current_user: UserDep, session: SessionDep):
-    return update_ticket_status_in_db(current_user=current_user, ticket_status_info=status_info, tid=tid, session=session)
+@router.patch("/{tid}/status", status_code=200, dependencies=[Depends(RoleChecker([Role.ADMIN, Role.STAFF]))])
+def update_ticket_status(tid: int, status_info: TicketStatusUpdate, session: SessionDep):
+    return update_ticket_status_in_db( ticket_status_info=status_info, tid=tid, session=session)
 
 @router.delete("/{tid}", status_code=204)
 def delete_ticket(tid: int, current_user: UserDep, session: SessionDep):

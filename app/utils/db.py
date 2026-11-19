@@ -70,12 +70,12 @@ def get_individual_ticket_from_db(session: SessionDep, tid: int, current_user: U
     #     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission to access this ticket")
     return ticket
     
-def update_ticket_status_in_db(current_user: UserDB, tid: int, ticket_status_info: TicketStatusUpdate,session: SessionDep):
-    if current_user.role == Role.USER:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="permission denied"
-        )
+def update_ticket_status_in_db(tid: int, ticket_status_info: TicketStatusUpdate,session: SessionDep):
+    # if current_user.role == Role.USER:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_403_FORBIDDEN,
+    #         detail="permission denied"
+    #     )
         
     db_ticket = session.get(TicketDB, tid) # tid is PK
     
