@@ -232,6 +232,7 @@ Secure-Support-Ticket-API/
 ├── scripts/
 │   ├── __init__.py
 │   └── promote_user.py
+├── tests/
 ├── .env
 ├── .env.example
 ├── .gitignore
@@ -265,7 +266,7 @@ Additionally,
 │   └── tokens.py
 ```
 
-## 11. Running tests (Yet to write test codes, work under construction)
+## 11. Running tests
 
 The project uses pytest, run the test suite from the repository root:
 

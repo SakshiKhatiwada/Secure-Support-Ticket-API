@@ -13,6 +13,11 @@ async def lifespan(app: FastAPI):
     yield
     
 app = FastAPI(title="Secure Support Ticket API", lifespan=lifespan)
+
+@app.get("/health", status_code=200)
+def health_check():
+    return {"status": "OK"}
+
 app.include_router(authentication_router)
 app.include_router(ticket_router)
 app.include_router(admin_router)

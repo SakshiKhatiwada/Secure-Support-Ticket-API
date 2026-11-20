@@ -6,3 +6,6 @@ pwdlib[argon2] # password hashing
 python-jose[cryptography]
 bcrypt==4.0.1
 passlib==1.7.4
+
+# testing
+pytest==9.2.0
