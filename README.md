@@ -257,7 +257,7 @@ Additionally,
 ```
 
 ```text
-├── utisl/
+├── utils/
 │   ├── auth.py
 │   ├── create_admin.py
 │   ├── db.py

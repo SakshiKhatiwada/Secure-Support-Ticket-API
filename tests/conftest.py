@@ -142,3 +142,13 @@ def normal_user_headers(normal_user, auth_headers):
 @pytest.fixture
 def staff_headers(promoted_staff, auth_headers):
     return auth_headers(promoted_staff)
+
+@pytest.fixture
+def add_commit_refresh(session):
+    def _add_commit_refresh(user):
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return user
+    return _add_commit_refresh
+        
